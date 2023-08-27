@@ -1,12 +1,13 @@
 #include "src/Position.h"
 #include "src/StupidEngine.h"
 #include "src/Game.h"
+#include "src/MinimaxEngine.h"
 #include <iostream>
 #include <unistd.h>
 
 int main() {
     Game g;
-    EngineBase* engine = new StupidEngine();
+    MinimaxEngine* engine = new MinimaxEngine(8);
 
     while (1) {
         g.print();
@@ -17,7 +18,19 @@ int main() {
                 std::cout << i << " " << x.lastMove << std::endl;
                 ++i;
             }
-            std::cin >> i;
+            std::string inp;
+            std::cin >> inp;
+            if (inp == "+") {
+                engine->maxDepth += 1;
+                std::cout << "Engine depth is " << engine->maxDepth << std::endl;
+                continue;
+            }
+            if (inp == "-") {
+                engine->maxDepth -= 1;
+                std::cout << "Engine depth is " << engine->maxDepth << std::endl;
+                continue;
+            }
+            i = atoi(inp.c_str());
             i--;
             std::string tomove = moves[i].lastMove;
             g.move(tomove);

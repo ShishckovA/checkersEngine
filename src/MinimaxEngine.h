@@ -17,26 +17,8 @@ public:
 
     MinimaxEngine(int maxDepth): maxDepth(maxDepth) {};
 
-    float positionScore(const Position& pos) {
-        float score = 0;
-        for (int i = 0; i < W; ++i) {
-            for (int j = (i + 1) % 2; j < W; j += 2) {
-                if (pos.board[i][j] == WHITE) {
-                    score += 1;
-                }
-                if (pos.board[i][j] == WHITE_QUEEN) {
-                    score += 5;
-                }
-                if (pos.board[i][j] == BLACK) {
-                    score -= 1;
-                }
-                if (pos.board[i][j] == BLACK_QUEEN) {
-                    score -= 5;
-                }
-            }
-        }
-        return score;
-    }
+    virtual double positionScore (const Position& pos) = 0;
+
 
     double minimax(Position pos, double alpha = -inf, double beta = inf, int depth = 0) {
         if (depth >= maxDepth) {
@@ -62,7 +44,6 @@ public:
                 beta = fmin(beta, value);
             }
         }
-//        std::cout << "Returning" << value << std::endl;
         return value;
     }
 

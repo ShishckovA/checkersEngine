@@ -32,7 +32,7 @@ void Position::print() const {
                     std::cout << " ";
                     break;
                 }
-                case WHITE: {
+                case WHITE_PIECE: {
                     std::cout << "O";
                     break;
                 }
@@ -40,7 +40,7 @@ void Position::print() const {
                     std::cout << "Q";
                     break;
                 }
-                case BLACK: {
+                case BLACK_PIECE: {
                     std::cout << "#";
                     break;
                 }
@@ -77,13 +77,16 @@ std::string cellString(int i, int j) {
     return notations[j] + std::to_string(W - i);
 }
 
+
+
 void Position::generateCapturingMoves(
         std::vector<Position> &moves,
         bool &hasAbilityToCapture,
         int i,
         int j,
-        int depth = 0,
-        std::string moveBuffer = ""
+        std::vector<std::pair<int, int>> capturedOnMove,
+        int depth,
+        std::string moveBuffer
     ) const {
     bool wasCapturing = false;
     if (depth == 0) {
@@ -93,6 +96,8 @@ void Position::generateCapturingMoves(
         for (int dirJ: {-1, 1}) {
             int overI = -1;
             int overJ = -1;
+            std::vector<std::tuple<Position, int, int>> capturingFinishesPositions;
+            bool nextCapturingAvailable = false;
             for (int step = 1; ; ++step) {
                 if (!isQueen(board[i][j]) && step > 2) {
                     break;
@@ -102,7 +107,7 @@ void Position::generateCapturingMoves(
                 if (!legalPos(finishI, finishJ)) {
                     break;
                 }
-                if (isMoversPiece(board[finishI][finishJ], mover)) {
+                if (isMoversPiece(board[finishI][finishJ], mover) || board[finishI][finishJ] == NOW_CAPTURING) {
                     break;
                 }
                 if (isOpponentPiece(board[finishI][finishJ], mover)) {
@@ -115,19 +120,33 @@ void Position::generateCapturingMoves(
                 }
                 if (overI != -1) {
                     Position newPos = copy();
-                    newPos.board[overI][overJ] = EMPTY;
                     newPos.movePiece(i, j, finishI, finishJ);
-                    newPos.generateCapturingMoves(
-                            moves,
-                            hasAbilityToCapture,
-                            finishI,
-                            finishJ,
-                            depth + 1,
-                            moveBuffer + ":" + cellString(finishI, finishJ)
-                    );
+                    newPos.board[overI][overJ] = NOW_CAPTURING;
+                    bool nextCapturingAvailableOnFinish = capturingAvailable(finishI, finishJ);
+                    if (nextCapturingAvailableOnFinish && !nextCapturingAvailable) {
+                        nextCapturingAvailable = true;
+                        capturingFinishesPositions.clear();
+                    }
+                    if (nextCapturingAvailable && !nextCapturingAvailableOnFinish) {
+                        continue;
+                    }
+                    capturingFinishesPositions.emplace_back(newPos, finishI, finishJ);
                     wasCapturing = true;
                 }
             }
+            capturedOnMove.emplace_back(overI, overJ);
+            for (const auto &[nextPos, nextPosI, nextPosJ] : capturingFinishesPositions) {
+                nextPos.generateCapturingMoves(
+                        moves,
+                        hasAbilityToCapture,
+                        nextPosI,
+                        nextPosJ,
+                        capturedOnMove,
+                        depth + 1,
+                        moveBuffer + ":" + cellString(nextPosI, nextPosJ)
+                );
+            }
+            capturedOnMove.pop_back();
         }
     }
     if (!wasCapturing && depth >= 1) {
@@ -136,6 +155,9 @@ void Position::generateCapturingMoves(
             moves.clear();
         }
         Position newPos = copy();
+        for (const auto& [capturedI, capturedJ] : capturedOnMove) {
+            newPos.board[capturedI][capturedJ] = EMPTY;
+        }
         newPos.changeMover();
         newPos.lastMove = moveBuffer;
         moves.push_back(newPos);
@@ -169,7 +191,8 @@ void Position::generateMoves(
         bool &hasAbilityToCapture,
         int i,
         int j) const {
-    generateCapturingMoves(moves, hasAbilityToCapture, i, j);
+    std::vector<std::pair<int, int>> buf;
+    generateCapturingMoves(moves, hasAbilityToCapture, i, j, buf);
 
     if (hasAbilityToCapture) {
         return;
@@ -218,13 +241,66 @@ std::vector<Position> Position::moves() {
 
 Position Position::start() {
     return Position({
-                            {EMPTY, BLACK, EMPTY, BLACK, EMPTY, BLACK, EMPTY, BLACK},
-                            {BLACK, EMPTY, BLACK, EMPTY, BLACK, EMPTY, BLACK, EMPTY},
-                            {EMPTY, BLACK, EMPTY, BLACK, EMPTY, BLACK, EMPTY, BLACK},
-                            {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
-                            {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
-                            {WHITE, EMPTY, WHITE, EMPTY, WHITE, EMPTY, WHITE, EMPTY},
-                            {EMPTY, WHITE, EMPTY, WHITE, EMPTY, WHITE, EMPTY, WHITE},
-                            {WHITE, EMPTY, WHITE, EMPTY, WHITE, EMPTY, WHITE, EMPTY}
+                            {EMPTY,       BLACK_PIECE, EMPTY,       BLACK_PIECE, EMPTY,       BLACK_PIECE, EMPTY,       BLACK_PIECE},
+                            {BLACK_PIECE, EMPTY,       BLACK_PIECE, EMPTY,       BLACK_PIECE, EMPTY,       BLACK_PIECE, EMPTY},
+                            {EMPTY,       BLACK_PIECE, EMPTY,       BLACK_PIECE, EMPTY,       BLACK_PIECE, EMPTY,       BLACK_PIECE},
+                            {EMPTY,       EMPTY,       EMPTY,       EMPTY,       EMPTY,       EMPTY,       EMPTY,       EMPTY},
+                            {EMPTY,       EMPTY,       EMPTY,       EMPTY,       EMPTY,       EMPTY,       EMPTY,       EMPTY},
+                            {WHITE_PIECE, EMPTY,       WHITE_PIECE, EMPTY,       WHITE_PIECE, EMPTY,       WHITE_PIECE, EMPTY},
+                            {EMPTY,       WHITE_PIECE, EMPTY,       WHITE_PIECE, EMPTY,       WHITE_PIECE, EMPTY,       WHITE_PIECE},
+                            {WHITE_PIECE, EMPTY,       WHITE_PIECE, EMPTY,       WHITE_PIECE, EMPTY,       WHITE_PIECE, EMPTY}
                     }, WHITE_MOVE);
+}
+
+std::string Position::toString() const {
+    std::string res;
+    for (int i = 0; i < W; ++i) {
+        for (int j = (i + 1) % 2; j < W; j += 2) {
+            if (board[i][j] == WHITE_PIECE) {
+                res += "w";
+            } else if (board[i][j] == WHITE_QUEEN) {
+                res += "W";
+            } else if (board[i][j] == BLACK_PIECE) {
+                res += "b";
+            } else if (board[i][j] == BLACK_QUEEN) {
+                res += "B";
+            } else {
+                res += "O";
+            }
+        }
+    }
+    res += mover == WHITE_MOVE ? "1" : "2";
+    return res;
+}
+
+bool Position::capturingAvailable(int i, int j) const {
+    for (int dirI : {-1, 1}) {
+        for (int dirJ: {-1, 1}) {
+            bool goOver = false;
+            for (int step = 1; ; ++step) {
+                if (!isQueen(board[i][j]) && step > 2) {
+                    break;
+                }
+                int finishI = i + dirI * step;
+                int finishJ = j + dirJ * step;
+                if (!legalPos(finishI, finishJ)) {
+                    break;
+                }
+                if (isMoversPiece(board[finishI][finishJ], mover)) {
+                    break;
+                }
+                if (isOpponentPiece(board[finishI][finishJ], mover)) {
+                    if (goOver) {
+                        break;
+                    }
+                    goOver = true;
+                    continue;
+                }
+                if (goOver) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }

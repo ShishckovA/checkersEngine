@@ -7,12 +7,16 @@
 
 
 #include "Position.h"
+#include <unordered_map>
 
 class Game {
     Position pos;
+    std::unordered_map<std::string, int> used_positions;
 
 public:
     Game();
+    Game(Position p);
+    Winner winner();
     void print();
     Mover mover();
     std::vector<Position> moves();

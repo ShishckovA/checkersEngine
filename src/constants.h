@@ -1,22 +1,30 @@
 #pragma once
 
 extern int W;
+extern int MAX_POSITION_REPEAT;
 #define WHITE_BIT 0x1
 #define BLACK_BIT 0x10
 #define QUEEN_BIT 0x100
 
 
 enum Cell {
-    WHITE = WHITE_BIT,
+    WHITE_PIECE = WHITE_BIT,
     WHITE_QUEEN = WHITE_BIT | QUEEN_BIT,
-    BLACK = BLACK_BIT,
+    BLACK_PIECE = BLACK_BIT,
     BLACK_QUEEN = BLACK_BIT | QUEEN_BIT,
+    NOW_CAPTURING = 0x1000,
     EMPTY = 0x0
 };
 
 enum Mover {
     WHITE_MOVE = WHITE_BIT,
     BLACK_MOVE = BLACK_BIT
+};
+
+enum Winner {
+    NO_WINNER = 0,
+    WHITE_WINNER = 1,
+    BLACK_WINNER = 2
 };
 
 inline bool isMoversPiece(Cell field, Mover mover) {

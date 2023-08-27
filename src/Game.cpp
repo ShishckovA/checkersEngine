@@ -8,10 +8,13 @@ bool Game::move(std::string move) {
     for (Position nextPos : pos.moves()) {
         if (nextPos.lastMove == move) {
             pos = nextPos;
+            if (++used_positions[pos.toString()] >= MAX_POSITION_REPEAT) {
+                return false;
+            }
             return true;
         }
     }
-    return false;
+    assert(false);
 }
 
 void Game::print() {
@@ -33,5 +36,11 @@ Position const Game::position() {
 
 Game::Game() {
     pos = Position::start();
+}
+
+Game::Game(Position p): pos(p) {}
+
+Winner Game::winner() {
+    return pos.winner();
 }
 

@@ -10,4 +10,6 @@ add_executable(checkers
         src/EngineBase.cpp
         src/StupidEngine.cpp
         src/Game.cpp
-        src/MinimaxEngine.cpp src/MinimaxEngine.h)
+        src/MinimaxEngine.cpp
+        src/engines.cpp
+        )

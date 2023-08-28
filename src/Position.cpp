@@ -48,6 +48,10 @@ void Position::print() const {
                     std::cout << "*";
                     break;
                 }
+                default: {
+                    std::cout << "?";
+                    break;
+                }
             }
         }
         std::cout << "|";
@@ -122,7 +126,7 @@ void Position::generateCapturingMoves(
                     Position newPos = copy();
                     newPos.movePiece(i, j, finishI, finishJ);
                     newPos.board[overI][overJ] = NOW_CAPTURING;
-                    bool nextCapturingAvailableOnFinish = capturingAvailable(finishI, finishJ);
+                    bool nextCapturingAvailableOnFinish = newPos.capturingAvailable(finishI, finishJ);
                     if (nextCapturingAvailableOnFinish && !nextCapturingAvailable) {
                         nextCapturingAvailable = true;
                         capturingFinishesPositions.clear();
@@ -286,7 +290,7 @@ bool Position::capturingAvailable(int i, int j) const {
                 if (!legalPos(finishI, finishJ)) {
                     break;
                 }
-                if (isMoversPiece(board[finishI][finishJ], mover)) {
+                if (isMoversPiece(board[finishI][finishJ], mover) || board[finishI][finishJ] == NOW_CAPTURING) {
                     break;
                 }
                 if (isOpponentPiece(board[finishI][finishJ], mover)) {

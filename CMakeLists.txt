@@ -11,5 +11,5 @@ add_executable(checkers
         src/StupidEngine.cpp
         src/Game.cpp
         src/MinimaxEngine.cpp
-        src/engines.cpp
+        src/Engines.cpp
         )

@@ -19,6 +19,7 @@ bool Game::move(std::string move) {
 
 void Game::print() {
     system("clear");
+    std::cout << position().toString() << std::endl;
     pos.print();
 }
 

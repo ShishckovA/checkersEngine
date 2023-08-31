@@ -10,6 +10,9 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <unordered_map>
+
+extern std::unordered_map<int, char> NOTATIONS;
 
 bool legalPos(int i, int j);
 

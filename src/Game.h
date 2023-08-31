@@ -8,6 +8,7 @@
 
 #include "Position.h"
 #include <unordered_map>
+#include <cassert>
 
 class Game {
     Position pos;

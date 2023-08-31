@@ -6,6 +6,7 @@
 #ifndef CHECKERS_POSITION_H
 #define CHECKERS_POSITION_H
 #include "constants.h"
+#include <cassert>
 #include <vector>
 #include <iostream>
 #include <string>

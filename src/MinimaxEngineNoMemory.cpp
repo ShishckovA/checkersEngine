@@ -19,20 +19,20 @@ double MinimaxEngineNoMemory::minimax(Position pos, double alpha, double beta, i
     if (pos.mover == WHITE_MOVE) {
         value = -inf;
         for (const Position& move : pos.moves()) {
-            value = fmax(value, minimax(move, alpha, beta, depth + 1));
+            value = std::max(value, minimax(move, alpha, beta, depth + 1));
             if (value > beta) {
                 break;
             }
-            alpha = fmax(alpha, value);
+            alpha = std::max(alpha, value);
         }
     } else {
         value = inf;
         for (const Position& move : pos.moves()) {
-            value = fmin(value, minimax(move, alpha, beta, depth + 1));
+            value = std::min(value, minimax(move, alpha, beta, depth + 1));
             if (value < alpha) {
                 break;
             }
-            beta = fmin(beta, value);
+            beta = std::min(beta, value);
         }
     }
     return value;

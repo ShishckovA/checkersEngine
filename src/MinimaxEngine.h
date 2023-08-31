@@ -7,6 +7,7 @@
 
 
 #include "EngineBase.h"
+#include <math.h>
 
 
 class MinimaxEngine : public EngineBase {

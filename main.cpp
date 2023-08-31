@@ -8,16 +8,17 @@
 
 
 void vsPC() {
-//    Game g;
-    Position p = Position::fromString("ObbbbObOObObbObOwbwOwwwwwOwOwOOO2");
-    Game g(p);
+    Game g;
+//    Position p = Position::fromString("OOOOBOOOOOOOOOOOOOOOOBOWOOOOOBOO1");
+//    Game g(p);
 
-    MinimaxEngine* engine = new ScoredFracEngine(5);
+    std::vector<std::string> positionHistory;
+    MinimaxEngine* engine = new ScoredFracEngine(8);
     std::string lastMove;
     while (1) {
         g.print();
         std::cout << "Last move: " <<  lastMove << std::endl;
-        if (g.mover() == BLACK_MOVE) {
+        if (g.mover() == WHITE_MOVE) {
             int i = 1;
             std::vector<Position> moves = g.moves();
             for (const auto& x : moves) {
@@ -36,9 +37,17 @@ void vsPC() {
                 std::cout << "Engine depth is " << engine->maxDepth << std::endl;
                 continue;
             }
+            if (inp == "z") {
+                std::cout << positionHistory.back() << std::endl;
+                std::cout << g.position().toString() << std::endl;
+                g = Game(Position::fromString(positionHistory.back()));
+                positionHistory.pop_back();
+                continue;
+            }
             i = atoi(inp.c_str());
             i--;
             std::string tomove = moves[i].lastMove;
+            positionHistory.push_back(g.position().toString());
             g.move(tomove);
         } else {
             auto start = clock();
@@ -67,15 +76,15 @@ int pairEngines(EngineBase *engineWhite, EngineBase *engineBlack, const std::str
         EngineBase *engineMoves = g.mover() == WHITE_MOVE ? engineWhite : engineBlack;
         std::string tomove = engineMoves->move(g.position());
         if (!g.move(tomove)) {
-            std::cout << "Draw (position repetition)!";
+            std::cout << "Draw (position repetition)!" << std::endl;
             return 0;
         }
     }
 }
 
 void e2e() {
-    EngineBase *engine1 = new ScoredFracEngine(6);
-    EngineBase *engine2 = new FracEngine(6);
+    EngineBase *engine1 = new ScoredFracEngineNoMemory(7);
+    EngineBase *engine2 = new ScoredFracEngine(7);
 
     std::vector<std::string> positions = {
         "",

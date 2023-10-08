@@ -36,7 +36,8 @@ std::string Requests::get(const std::string &url, int maxRetry, int sleepTimeout
             } catch (const std::runtime_error &err) {
                 std::cerr << err.what() << std::endl;
                 std::cerr << "Sleeping for " << sleepTimeout << " seconds..." << std::endl;
-                sleep(sleepTimeout);
+                std::chrono::milliseconds timespan(2000);
+                std::this_thread::sleep_for(timespan);;
                 continue;
             }
         }

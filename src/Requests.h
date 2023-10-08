@@ -10,11 +10,10 @@
 #include <string>
 #include <istream>
 #include <ostream>
-#include <boost/asio.hpp>
 #include <curl/curl.h>
 #include <stdexcept>
-
-using boost::asio::ip::tcp;
+#include <chrono>
+#include <thread>
 
 namespace Requests {
     std::string get(const std::string &url, int maxRetry=5, int sleepTimeout=2);

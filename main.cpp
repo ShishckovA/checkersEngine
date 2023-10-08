@@ -10,6 +10,7 @@
 #include <chrono>
 #include <mutex>
 #include <csignal>
+#include <unistd.h>
 
 
 void vsPC() {

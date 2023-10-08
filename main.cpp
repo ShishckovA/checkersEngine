@@ -265,5 +265,7 @@ void followGame(const std::string &url) {
 
 
 int main() {
-    followGame("https://lidraughts.org/mrkS2EPF");
+    std::string url;
+    std::cin >> url;
+    followGame(url);
 }

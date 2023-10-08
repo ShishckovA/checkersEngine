@@ -92,8 +92,15 @@ void MinimaxEngine::infinite(const Position &pos) {
 std::vector<std::pair<Position, double>> MinimaxEngine::sortedMovesWithScores(Position pos, bool descending) const {
     std::vector<std::pair<Position, double>> moves;
     for (const Position& move : pos.moves()) {
+        const auto it = database.find(move.toString());
+        double posScore;
+        if (it != database.end()) {
+            posScore = it->second.second;
+        } else {
+            posScore = positionScore(move);
+        }
         std::string posString = move.toString();
-        moves.emplace_back(move, positionScore(move));
+        moves.emplace_back(move, posScore);
     }
     std::sort(moves.begin(), moves.end(), [descending] (
             const std::pair<Position, double>& lhs, const std::pair<Position, double>& rhs)

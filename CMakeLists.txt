@@ -24,7 +24,10 @@ add_executable(
         src/MinimaxEngine.cpp
         src/MinimaxEngineNoMemory.cpp
         src/Engines.cpp
-        src/Requests.cpp src/Requests.cpp src/LidraughtsGame.cpp)
+        src/Requests.cpp
+        src/LidraughtsActivity.cpp
+        src/LidraughtsGame.cpp
+        src/LidraughtsPuzzle.cpp src/LidraughtsPuzzle.h)
 
 
 find_package (CURL)

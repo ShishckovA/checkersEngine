@@ -7,6 +7,7 @@
 #include "src/Engines.cpp"
 #include "src/Requests.h"
 #include "src/LidraughtsGame.h"
+#include "src/LidraughtsPuzzle.h"
 #include <chrono>
 #include <mutex>
 #include <csignal>
@@ -226,18 +227,11 @@ void generatePositions(int n = 10, int maxMoves = 20) {
 
 void infinite(const Position& pos, MinimaxEngine* e, int startingDepth = 4) {
     e->maxDepth = startingDepth;
-    e->infinite(pos);
+    e->infinite(pos, 3);
 }
 
-void followGame(const std::string &url) {
-    std::string corrUrl;
-    if (url.size() != 31) {
-        corrUrl = url.substr(0, 31);
-    } else {
-        corrUrl = url;
-    }
-    auto lg = LidraughtsGame(corrUrl);
-    auto [hasUpdates, pos] = lg.getCurrent();
+void followGame(LidraughtsActivity* activity, const std::string &url) {
+    auto [hasUpdates, pos] = activity->getCurrent();
     MinimaxEngine* e = new ScoredFracEngine(5);
     while (true) {
         pid_t pid = fork();
@@ -248,7 +242,7 @@ void followGame(const std::string &url) {
         } else if (pid > 0) {
 
             do {
-                auto pp = lg.getCurrent();
+                auto pp = activity->getCurrent();
                 hasUpdates = std::get<0>(pp);
                 pos = std::get<1>(pp);
                 std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -267,5 +261,14 @@ void followGame(const std::string &url) {
 int main() {
     std::string url;
     std::cin >> url;
-    followGame(url);
+    LidraughtsActivity* activity;
+    if (url.find("training") != std::string::npos) {
+        activity = new LidraughtsPuzzle(url);
+    } else {
+        if (url.size() != 31) {
+            url = url.substr(0, 31);
+        }
+        activity = new LidraughtsGame(url);
+    }
+    followGame(activity, url);
 }

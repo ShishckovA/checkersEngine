@@ -26,9 +26,13 @@ public:
 
     std::string move(Position pos) override;
 
-    std::vector<std::pair<Position, double>> sortedMovesWithScores(Position pos, bool descending) const;
+    std::vector<std::pair<Position, double>> sortedMovesWithScores(const Position &pos) const;
 
-    void infinite(const Position &pos);
+private:
+    std::vector<Position> _bestSequence(const Position &start, int depth);
+public:
+    void infinite(const Position &pos, int maxOutput = 3);
+    std::vector<Position> bestSequence(const Position &start, int depth=7);
 };
 
 

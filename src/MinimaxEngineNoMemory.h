@@ -18,10 +18,9 @@ public:
 
     MinimaxEngineNoMemory(int maxDepth): maxDepth(maxDepth) {};
 
-    virtual double positionScore (const Position& pos) = 0;
+    virtual double positionScore (const Position& pos) const = 0;
 
-
-    double minimax(Position pos, double alpha = -inf, double beta = inf, int depth = 0);
+    double minimax(Position pos, double alpha = -inf, double beta = inf, int depth = 0) const;
 
     std::string move(Position pos) override;
 

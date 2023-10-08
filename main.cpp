@@ -5,20 +5,26 @@
 #include "src/Game.h"
 #include "src/MinimaxEngine.h"
 #include "src/Engines.cpp"
+#include "src/Requests.h"
+#include "src/LidraughtsGame.h"
+#include <chrono>
+#include <mutex>
+#include <csignal>
 
 
 void vsPC() {
-    Game g;
-//    Position p = Position::fromString("OOOOBOOOOOOOOOOOOOOOOBOWOOOOOBOO1");
-//    Game g(p);
+//    Game g;
+    Position p = Position::fromString("0bb0b0b0bb0wbb000w00www00w0000ww1");
+    Game g(p);
 
     std::vector<std::string> positionHistory;
     MinimaxEngine* engine = new ScoredFracEngine(8);
     std::string lastMove;
-    while (1) {
+    while (true) {
         g.print();
         std::cout << "Last move: " <<  lastMove << std::endl;
-        if (g.mover() == WHITE_MOVE) {
+        if (g.mover() == BLACK_MOVE) {
+//        if (g.mover() == WHITE_MOVE) {
             int i = 1;
             std::vector<Position> moves = g.moves();
             for (const auto& x : moves) {
@@ -44,7 +50,7 @@ void vsPC() {
                 positionHistory.pop_back();
                 continue;
             }
-            i = atoi(inp.c_str());
+            i = (int) std::strtol(inp.c_str(), nullptr, 10);
             i--;
             std::string tomove = moves[i].lastMove;
             positionHistory.push_back(g.position().toString());
@@ -65,7 +71,7 @@ int pairEngines(EngineBase *engineWhite, EngineBase *engineBlack, const std::str
     if (!startPos.empty()) {
         g = Game(Position::fromString(startPos));
     }
-    while (1) {
+    while (true) {
         g.print();
         std::cout << g.position().toString() << std::endl;
         Winner winner = g.winner();
@@ -81,6 +87,7 @@ int pairEngines(EngineBase *engineWhite, EngineBase *engineBlack, const std::str
         }
     }
 }
+
 
 void e2e() {
     EngineBase *engine1 = new ScoredFracEngineNoMemory(7);
@@ -214,17 +221,46 @@ void generatePositions(int n = 10, int maxMoves = 20) {
     }
 }
 
-void test() {
-    Game g = Game(Position::fromString("B00000000W00000000000W000000W0002"));
-    g.print();
-    for (const auto& move : g.moves()) {
-        move.print();
+void infinite(const Position& pos, int startingDepth = 4) {
+    ScoredFracEngine engine(startingDepth);
+    engine.infinite(pos);
+}
+
+void followGame(const std::string &url) {
+    std::string corrUrl;
+    if (url.size() != 31) {
+        corrUrl = url.substr(0, 31);
+    } else {
+        corrUrl = url;
+    }
+    auto lg = LidraughtsGame(corrUrl);
+    auto [hasUpdates, pos] = lg.getCurrent();
+
+    while (true) {
+        pid_t pid = fork();
+
+        if (pid == 0) {
+            infinite(pos);
+            exit(0);
+        } else if (pid > 0) {
+
+            do {
+                auto pp = lg.getCurrent();
+                hasUpdates = std::get<0>(pp);
+                pos = std::get<1>(pp);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            } while (!hasUpdates);
+
+            kill(pid, SIGKILL);
+            wait(nullptr);
+        } else {
+            std::cerr << "Fork failed" << std::endl;
+            exit(1);
+        }
     }
 }
 
+
 int main() {
-    vsPC();
-//    test();
-//    e2e();
-//    generatePositions(100, 5);
+    followGame("https://lidraughts.org/mrkS2EPF");
 }

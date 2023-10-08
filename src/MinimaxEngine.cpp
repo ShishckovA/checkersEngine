@@ -7,7 +7,7 @@
 double MinimaxEngine::minimax(Position pos, double alpha, double beta, int depth) {
     std::string posString = pos.toString();
     const auto res = database.find(posString);
-    if (res != database.end() && res->second.first >= maxDepth - depth) {
+    if (res != database.end() && res->second.first >= depth) {
         return res->second.second;
     }
     std::vector<Position> curMoves = pos.moves();
@@ -15,16 +15,17 @@ double MinimaxEngine::minimax(Position pos, double alpha, double beta, int depth
         return pos.mover == WHITE_MOVE ? -inf : inf;
     }
     if (curMoves.size() == 1) {
-        depth -= 1;
+        depth += 1;
     }
-    if (depth >= maxDepth) {
+    if (depth == 0) {
         return positionScore(pos);
     }
     double value;
     if (pos.mover == WHITE_MOVE) {
         value = -inf;
-        for (const Position& move : pos.moves()) {
-            value = std::max(value, minimax(move, alpha, beta, depth + 1));
+        for (const auto& [move, _] : sortedMovesWithScores(pos, false)) {
+            value = std::max(value, minimax(move, alpha, beta, depth - 1));
+
             if (value > beta) {
                 break;
             }
@@ -32,15 +33,15 @@ double MinimaxEngine::minimax(Position pos, double alpha, double beta, int depth
         }
     } else {
         value = inf;
-        for (const Position& move : pos.moves()) {
-            value = std::min(value, minimax(move, alpha, beta, depth + 1));
+        for (const auto& [move, _] : sortedMovesWithScores(pos, true)) {
+            value = std::min(value, minimax(move, alpha, beta, depth - 1));
             if (value < alpha) {
                 break;
             }
             beta = std::min(beta, value);
         }
     }
-    database[posString] = {maxDepth - depth, value};
+    database[posString] = {depth, value};
     return value;
 }
 
@@ -49,11 +50,58 @@ std::string MinimaxEngine::move(Position pos) {
     double bestValue = -inf;
     int minSign = pos.mover == WHITE_MOVE ? 1 : -1;
     for (const auto &move : pos.moves()) {
-        if (minimax(move) * minSign > bestValue) {
+        double moveScore = minimax(move, -inf, inf, maxDepth);
+        if (moveScore * minSign > bestValue) {
             bestMove = move.lastMove;
-            bestValue = minimax(move) * minSign;
+            bestValue = moveScore * minSign;
         }
     }
     std::cout << "Found best move with value " << bestValue << std::endl;
     return bestMove;
+}
+
+void MinimaxEngine::infinite(const Position &pos) {
+    bool descending = pos.mover == WHITE_MOVE;
+    while (true) {
+        std::vector<std::pair<Position, double>> moves;
+        for (const Position& move : pos.moves()) {
+            std::string posString = move.toString();
+            double minimaxx = minimax(move, -inf, inf, maxDepth);
+            moves.emplace_back(move, minimaxx);
+        }
+
+        std::sort(moves.begin(), moves.end(), [descending] (
+                const std::pair<Position, double>& lhs, const std::pair<Position, double>& rhs)
+                -> bool {
+            if (descending) {
+                return (lhs.second > rhs.second);
+            }
+            return (lhs.second < rhs.second);
+        });
+        pos.print();
+        std::cout << "Depth:" <<  maxDepth << std::endl;
+
+        for (const auto &[move, score] : moves) {
+            std::cout << move.lastMove << ": " << score << std::endl;
+        }
+        ++maxDepth;
+    }
+}
+
+
+std::vector<std::pair<Position, double>> MinimaxEngine::sortedMovesWithScores(Position pos, bool descending) const {
+    std::vector<std::pair<Position, double>> moves;
+    for (const Position& move : pos.moves()) {
+        std::string posString = move.toString();
+        moves.emplace_back(move, positionScore(move));
+    }
+    std::sort(moves.begin(), moves.end(), [descending] (
+            const std::pair<Position, double>& lhs, const std::pair<Position, double>& rhs)
+            -> bool {
+        if (descending) {
+            return (lhs.second > rhs.second);
+        }
+        return (lhs.second < rhs.second);
+    });
+    return moves;
 }

@@ -229,7 +229,7 @@ void Position::generateMoves(
 }
 
 
-std::vector<Position> Position::moves() {
+std::vector<Position> Position::moves() const {
     std::vector<Position> res;
     bool hasAbilityToBeat = false;
     for (int i = 0; i < W; ++i) {

@@ -30,7 +30,7 @@ public:
 
     void print() const;
 
-    std::vector<Position> moves();
+    std::vector<Position> moves() const;
 
 
     void generateMoves(std::vector<Position> &moves, bool &hasAbilityToCapture, int i, int j) const;

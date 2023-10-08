@@ -20,13 +20,15 @@ public:
 
     MinimaxEngine(int maxDepth): maxDepth(maxDepth) {};
 
-    virtual double positionScore (const Position& pos) = 0;
+    virtual double positionScore(const Position& pos) const = 0;
 
-
-    double minimax(Position pos, double alpha = -inf, double beta = inf, int depth = 0);
+    double minimax(Position pos, double alpha, double beta, int depth = 0);
 
     std::string move(Position pos) override;
 
+    std::vector<std::pair<Position, double>> sortedMovesWithScores(Position pos, bool descending) const;
+
+    void infinite(const Position &pos);
 };
 
 

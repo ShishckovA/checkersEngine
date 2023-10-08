@@ -11,6 +11,8 @@
 #include <mutex>
 #include <csignal>
 #include <unistd.h>
+#include <sys/wait.h>
+
 
 
 void vsPC() {

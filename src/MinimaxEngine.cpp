@@ -23,7 +23,7 @@ double MinimaxEngine::minimax(Position pos, double alpha, double beta, int depth
     double value;
     if (pos.mover == WHITE_MOVE) {
         value = -inf;
-        for (const auto& [move, _] : sortedMovesWithScores(pos, false)) {
+        for (const auto& [move, _] : sortedMovesWithScores(pos, true)) {
             value = std::max(value, minimax(move, alpha, beta, depth - 1));
 
             if (value > beta) {
@@ -33,7 +33,7 @@ double MinimaxEngine::minimax(Position pos, double alpha, double beta, int depth
         }
     } else {
         value = inf;
-        for (const auto& [move, _] : sortedMovesWithScores(pos, true)) {
+        for (const auto& [move, _] : sortedMovesWithScores(pos, false)) {
             value = std::min(value, minimax(move, alpha, beta, depth - 1));
             if (value < alpha) {
                 break;
@@ -64,7 +64,7 @@ void MinimaxEngine::infinite(const Position &pos) {
     bool descending = pos.mover == WHITE_MOVE;
     while (true) {
         std::vector<std::pair<Position, double>> moves;
-        for (const Position& move : pos.moves()) {
+        for (const auto& [move, score] : sortedMovesWithScores(pos, descending)) {
             std::string posString = move.toString();
             double minimaxx = minimax(move, -inf, inf, maxDepth);
             moves.emplace_back(move, minimaxx);

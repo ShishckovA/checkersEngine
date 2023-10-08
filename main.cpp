@@ -224,9 +224,9 @@ void generatePositions(int n = 10, int maxMoves = 20) {
     }
 }
 
-void infinite(const Position& pos, int startingDepth = 4) {
-    ScoredFracEngine engine(startingDepth);
-    engine.infinite(pos);
+void infinite(const Position& pos, MinimaxEngine* e, int startingDepth = 4) {
+    e->maxDepth = startingDepth;
+    e->infinite(pos);
 }
 
 void followGame(const std::string &url) {
@@ -238,12 +238,12 @@ void followGame(const std::string &url) {
     }
     auto lg = LidraughtsGame(corrUrl);
     auto [hasUpdates, pos] = lg.getCurrent();
-
+    MinimaxEngine* e = new ScoredFracEngine(5);
     while (true) {
         pid_t pid = fork();
 
         if (pid == 0) {
-            infinite(pos);
+            infinite(pos, e);
             exit(0);
         } else if (pid > 0) {
 

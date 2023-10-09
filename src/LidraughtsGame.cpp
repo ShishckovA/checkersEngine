@@ -4,8 +4,10 @@
 
 #include "LidraughtsGame.h"
 
+#include <utility>
 
-LidraughtsGame::LidraughtsGame(std::string gameUrl) : LidraughtsActivity(gameUrl) {}
+
+LidraughtsGame::LidraughtsGame(std::string gameUrl) : LidraughtsActivity(std::move(gameUrl)) {}
 
 std::string LidraughtsGame::getFen() {
     std::string result = getPageCode();

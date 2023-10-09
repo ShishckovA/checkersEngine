@@ -4,7 +4,7 @@
 
 #include "MinimaxEngineNoMemory.h"
 
-double MinimaxEngineNoMemory::minimax(Position pos, double alpha, double beta, int depth) const {
+double MinimaxEngineNoMemory::minimax(const Position& pos, double alpha, double beta, int depth) const {
     std::vector<Position> curMoves = pos.moves();
     if (curMoves.empty()) {
         return pos.mover == WHITE_MOVE ? -inf : inf;
@@ -39,12 +39,12 @@ double MinimaxEngineNoMemory::minimax(Position pos, double alpha, double beta, i
 }
 
 std::string MinimaxEngineNoMemory::move(Position pos) {
-    std::string bestMove = pos.moves()[0].lastMove;
+    std::string bestMove = pos.moves()[0].lastMoveString;
     double bestValue = -inf;
     int minSign = pos.mover == WHITE_MOVE ? 1 : -1;
     for (const auto &move : pos.moves()) {
         if (minimax(move) * minSign > bestValue) {
-            bestMove = move.lastMove;
+            bestMove = move.lastMoveString;
             bestValue = minimax(move) * minSign;
         }
     }

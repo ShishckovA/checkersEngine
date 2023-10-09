@@ -16,7 +16,7 @@ class LidraughtsGame : public LidraughtsActivity {
 public:
     explicit LidraughtsGame(std::string gameUrl);
 
-    std::string getFen();
+    std::string getFen() override;
 
 };
 

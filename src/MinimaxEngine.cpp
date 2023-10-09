@@ -4,7 +4,7 @@
 
 #include "MinimaxEngine.h"
 
-double MinimaxEngine::minimax(Position pos, double alpha, double beta, int depth) {
+double MinimaxEngine::minimax(const Position& pos, double alpha, double beta, int depth) {
     std::string posString = pos.toString();
     const auto res = database.find(posString);
     if (res != database.end() && res->second.first >= depth) {
@@ -46,13 +46,13 @@ double MinimaxEngine::minimax(Position pos, double alpha, double beta, int depth
 }
 
 std::string MinimaxEngine::move(Position pos) {
-    std::string bestMove = pos.moves()[0].lastMove;
+    std::string bestMove = pos.moves()[0].lastMoveString;
     double bestValue = -inf;
     int minSign = pos.mover == WHITE_MOVE ? 1 : -1;
     for (const auto &move : pos.moves()) {
         double moveScore = minimax(move, -inf, inf, maxDepth);
         if (moveScore * minSign > bestValue) {
-            bestMove = move.lastMove;
+            bestMove = move.lastMoveString;
             bestValue = moveScore * minSign;
         }
     }
@@ -60,14 +60,14 @@ std::string MinimaxEngine::move(Position pos) {
     return bestMove;
 }
 
-void MinimaxEngine::infinite(const Position &pos, int maxOutput) {
+[[noreturn]] void MinimaxEngine::infinite(const Position &pos, int maxOutput) {
     bool descending = pos.mover == WHITE_MOVE;
     while (true) {
         std::vector<std::pair<Position, double>> moves;
         for (const auto& [move, score] : sortedMovesWithScores(pos)) {
             std::string posString = move.toString();
-            double minimaxx = minimax(move, -inf, inf, maxDepth);
-            moves.emplace_back(move, minimaxx);
+            double minimax_val = minimax(move, -inf, inf, maxDepth);
+            moves.emplace_back(move, minimax_val);
         }
 
         std::sort(moves.begin(), moves.end(), [descending] (
@@ -82,11 +82,11 @@ void MinimaxEngine::infinite(const Position &pos, int maxOutput) {
         std::cout << "Depth:" <<  maxDepth << std::endl;
         int output = 0;
         for (const auto &[move, score] : moves) {
-            std::cout << move.lastMove << ": " << score * 100 << std::endl;
-            const auto& bestSeq = bestSequence(move);
+            std::printf("%s: %.3f\n", move.lastMoveString.c_str(), score * 100);
+            const auto& bestSeq = bestSequence(move, maxOutput);
             std::cout << "( ";
-            for (auto nextMove : bestSeq) {
-                std::cout << nextMove.lastMove << " ";
+            for (const auto &nextMove : bestSeq) {
+                std::cout << nextMove.lastMoveString << " ";
             }
             std::cout << ")" << std::endl;
             output++;

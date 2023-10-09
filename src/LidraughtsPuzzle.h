@@ -10,7 +10,7 @@
 
 class LidraughtsPuzzle : public LidraughtsActivity {
 public:
-    LidraughtsPuzzle(const std::string& puzzleUrl);
+    explicit LidraughtsPuzzle(const std::string& puzzleUrl);
     std::string getFen() override {
         std::string result = getPageCode();
         size_t fen = result.rfind("\"fen\":");

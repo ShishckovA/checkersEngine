@@ -4,9 +4,11 @@
 
 #include "Game.h"
 
-bool Game::move(std::string move) {
-    for (Position nextPos : pos.moves()) {
-        if (nextPos.lastMove == move) {
+#include <utility>
+
+bool Game::move(const std::string& move) {
+    for (const Position& nextPos : pos.moves()) {
+        if (nextPos.lastMoveString == move) {
             pos = nextPos;
             if (++used_positions[pos.toString()] >= MAX_POSITION_REPEAT) {
                 return false;
@@ -23,7 +25,7 @@ void Game::print() {
     pos.print();
 }
 
-Mover Game::mover() {
+Mover Game::mover() const {
     return pos.mover;
 }
 
@@ -31,7 +33,7 @@ std::vector<Position> Game::moves() {
     return pos.moves();
 }
 
-Position const Game::position() {
+Position Game::position() {
     return pos;
 }
 
@@ -39,7 +41,7 @@ Game::Game() {
     pos = Position::start();
 }
 
-Game::Game(Position p): pos(p) {}
+Game::Game(Position p): pos(std::move(std::move(p))) {}
 
 Winner Game::winner() {
     return pos.winner();

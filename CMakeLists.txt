@@ -23,7 +23,7 @@ add_executable(
         src/Game.cpp
         src/MinimaxEngine.cpp
         src/MinimaxEngineNoMemory.cpp
-        src/Engines.cpp
+        src/Engines.hpp
         src/Requests.cpp
         src/LidraughtsActivity.cpp
         src/LidraughtsGame.cpp

@@ -4,19 +4,14 @@
 #include "src/StupidEngine.h"
 #include "src/Game.h"
 #include "src/MinimaxEngine.h"
-#include "src/Engines.cpp"
-#include "src/Requests.h"
+#include "src/Engines.hpp"
 #include "src/LidraughtsGame.h"
 #include "src/LidraughtsPuzzle.h"
 #include <chrono>
 #include <mutex>
-#include <csignal>
-#include <unistd.h>
-#include <sys/wait.h>
 
 
-
-void vsPC() {
+[[noreturn]] void vsPC() {
 //    Game g;
     Position p = Position::fromString("0bb0b0b0bb0wbb000w00www00w0000ww1");
     Game g(p);
@@ -28,11 +23,10 @@ void vsPC() {
         g.print();
         std::cout << "Last move: " <<  lastMove << std::endl;
         if (g.mover() == BLACK_MOVE) {
-//        if (g.mover() == WHITE_MOVE) {
             int i = 1;
             std::vector<Position> moves = g.moves();
             for (const auto& x : moves) {
-                std::cout << i << " " << x.lastMove << std::endl;
+                std::cout << i << " " << x.lastMoveString << std::endl;
                 ++i;
             }
             std::string inp;
@@ -56,16 +50,16 @@ void vsPC() {
             }
             i = (int) std::strtol(inp.c_str(), nullptr, 10);
             i--;
-            std::string tomove = moves[i].lastMove;
+            std::string to_move = moves[i].lastMoveString;
             positionHistory.push_back(g.position().toString());
-            g.move(tomove);
+            g.move(to_move);
         } else {
             auto start = clock();
-            std::string tomove = engine->move(g.position());
+            std::string to_move = engine->move(g.position());
             auto end = clock();
             std::cout << end - start << std::endl;
-            g.move(tomove);
-            lastMove = tomove;
+            g.move(to_move);
+            lastMove = to_move;
         }
     }
 }
@@ -84,8 +78,8 @@ int pairEngines(EngineBase *engineWhite, EngineBase *engineBlack, const std::str
             return (winner == WHITE_WINNER) ? 1 : -1;
         }
         EngineBase *engineMoves = g.mover() == WHITE_MOVE ? engineWhite : engineBlack;
-        std::string tomove = engineMoves->move(g.position());
-        if (!g.move(tomove)) {
+        std::string to_move = engineMoves->move(g.position());
+        if (!g.move(to_move)) {
             std::cout << "Draw (position repetition)!" << std::endl;
             return 0;
         }
@@ -209,8 +203,8 @@ void generatePositions(int n = 10, int maxMoves = 20) {
         Winner winner;
         int gameMoves = rand() % maxMoves;
         for (int i = 0; i < gameMoves * 2; ++i) {
-            std::string tomove = engine.move(game.position());
-            game.move(tomove);
+            std::string to_move = engine.move(game.position());
+            game.move(to_move);
 
             winner = game.winner();
             if (winner != NO_WINNER) {
@@ -222,38 +216,6 @@ void generatePositions(int n = 10, int maxMoves = 20) {
         }
         gameNum++;
         std::cout << "\"" << game.position().toString() << "\"," <<  std::endl;
-    }
-}
-
-void infinite(const Position& pos, MinimaxEngine* e, int startingDepth = 4) {
-    e->maxDepth = startingDepth;
-    e->infinite(pos, 3);
-}
-
-void followGame(LidraughtsActivity* activity, const std::string &url) {
-    auto [hasUpdates, pos] = activity->getCurrent();
-    MinimaxEngine* e = new ScoredFracEngine(5);
-    while (true) {
-        pid_t pid = fork();
-
-        if (pid == 0) {
-            infinite(pos, e);
-            exit(0);
-        } else if (pid > 0) {
-
-            do {
-                auto pp = activity->getCurrent();
-                hasUpdates = std::get<0>(pp);
-                pos = std::get<1>(pp);
-                std::this_thread::sleep_for(std::chrono::seconds(1));
-            } while (!hasUpdates);
-
-            kill(pid, SIGKILL);
-            wait(nullptr);
-        } else {
-            std::cerr << "Fork failed" << std::endl;
-            exit(1);
-        }
     }
 }
 
@@ -270,5 +232,8 @@ int main() {
         }
         activity = new LidraughtsGame(url);
     }
-    followGame(activity, url);
+    MinimaxEngine* engine = new ScoredFracEngine(5);
+    activity->follow(engine);
+    delete activity;
+    delete engine;
 }

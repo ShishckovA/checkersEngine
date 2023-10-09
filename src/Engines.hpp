@@ -3,8 +3,8 @@
 
 class DiffEngine : public MinimaxEngine {
 public:
-    explicit DiffEngine(int depth): MinimaxEngine(depth){};
-    double positionScore(const Position& pos) const override {
+    [[maybe_unused]] explicit DiffEngine(int depth): MinimaxEngine(depth){};
+    [[nodiscard]] double positionScore(const Position& pos) const override {
         float score = 0;
         for (int i = 0; i < W; ++i) {
             for (int j = (i + 1) % 2; j < W; j += 2) {
@@ -28,9 +28,9 @@ public:
 
 class FracEngine : public MinimaxEngine {
 public:
-    explicit FracEngine(int depth): MinimaxEngine(depth) {};
+    [[maybe_unused]] explicit FracEngine(int depth): MinimaxEngine(depth) {};
 
-    double positionScore(const Position& pos) const override {
+    [[nodiscard]] double positionScore(const Position& pos) const override {
         double whites = 0;
         double black = 0;
         for (int i = 0; i < W; ++i) {
@@ -60,7 +60,7 @@ class ScoredFracEngine : public MinimaxEngine {
 public:
     explicit ScoredFracEngine(int depth): MinimaxEngine(depth) {};
 
-    double positionScore(const Position& pos) const override {
+    [[nodiscard]] double positionScore(const Position& pos) const override {
         std::vector<double> horizontal_scores = {1.02, 1.08, 1.18, 1.32, 1.51, 1.73, 2};
         double whites = 0;
         double black = 0;
@@ -89,7 +89,7 @@ class ScoredFracEngineNoMemory : public MinimaxEngineNoMemory {
 public:
     explicit ScoredFracEngineNoMemory(int depth): MinimaxEngineNoMemory(depth) {};
 
-    double positionScore(const Position& pos) const override {
+    [[nodiscard]] double positionScore(const Position& pos) const override {
         std::vector<double> horizontal_scores = {1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6};
         double whites = 0;
         double black = 0;

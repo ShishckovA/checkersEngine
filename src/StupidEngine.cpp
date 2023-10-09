@@ -6,5 +6,5 @@
 
 std::string StupidEngine::move(Position pos) {
     std::vector<Position> moves = pos.moves();
-    return moves[rand() % moves.size()].lastMove;
+    return moves[rand() % moves.size()].lastMoveString;
 }

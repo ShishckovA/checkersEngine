@@ -16,13 +16,13 @@ class Game {
 
 public:
     Game();
-    Game(Position p);
+    explicit Game(Position p);
     Winner winner();
     void print();
-    Mover mover();
+    [[nodiscard]] Mover mover() const;
     std::vector<Position> moves();
-    bool move(std::string move);
-    Position const position();
+    bool move(const std::string& move);
+    Position position();
 };
 
 

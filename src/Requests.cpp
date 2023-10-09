@@ -37,7 +37,7 @@ std::string Requests::get(const std::string &url, int maxRetry, int sleepTimeout
                 std::cerr << err.what() << std::endl;
                 std::cerr << "Sleeping for " << sleepTimeout << " seconds..." << std::endl;
                 std::chrono::milliseconds timespan(2000);
-                std::this_thread::sleep_for(timespan);;
+                std::this_thread::sleep_for(timespan);
                 continue;
             }
         }

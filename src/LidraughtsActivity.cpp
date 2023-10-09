@@ -20,9 +20,9 @@ std::string LidraughtsActivity::convertFenToPosition(std::string fen) {
         } else {
             if (num > 0) {
                 if (isQueen) {
-                    mover = toupper(mover);
+                    mover = (char) toupper(mover);
                 } else {
-                    mover = tolower(mover);
+                    mover = (char) tolower(mover);
                 }
                 result[num - 1] = mover;
             }

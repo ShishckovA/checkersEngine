@@ -12,15 +12,17 @@
 class MinimaxEngineNoMemory : public EngineBase {
 private:
     constexpr const static double inf = 1000;
-    const double discount = 1;
+    [[maybe_unused]] const double discount = 1;
 public:
     int maxDepth;
 
-    MinimaxEngineNoMemory(int maxDepth): maxDepth(maxDepth) {};
+    explicit MinimaxEngineNoMemory(int maxDepth): maxDepth(maxDepth) {};
+    virtual ~MinimaxEngineNoMemory() = default;
 
-    virtual double positionScore (const Position& pos) const = 0;
 
-    double minimax(Position pos, double alpha = -inf, double beta = inf, int depth = 0) const;
+    [[nodiscard]] virtual double positionScore(const Position& pos) const = 0;
+
+    [[nodiscard]] double minimax(const Position& pos, double alpha = -inf, double beta = inf, int depth = 0) const;
 
     std::string move(Position pos) override;
 

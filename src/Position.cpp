@@ -72,11 +72,6 @@ bool legalPos(int i, int j) {
 }
 
 
-std::string moveString(int i1, int j1, int i2, int j2) {
-
-    return NOTATIONS[j1] + std::to_string(W - i1) + ":" + NOTATIONS[j2] + std::to_string(W - i2) + " ";
-}
-
 std::string cellString(int i, int j) {
     return NOTATIONS[j] + std::to_string(W - i);
 }
@@ -163,7 +158,7 @@ void Position::generateCapturingMoves(
             newPos.board[capturedI][capturedJ] = EMPTY;
         }
         newPos.changeMover();
-        newPos.lastMove = moveBuffer;
+        newPos.lastMoveString = moveBuffer;
         moves.push_back(newPos);
     }
 }
@@ -217,7 +212,7 @@ void Position::generateMoves(
                 }
                 Position newPos = copy();
                 newPos.movePiece(i, j, finishI, finishJ);
-                newPos.lastMove = cellString(i, j) + "-" + cellString(finishI, finishJ);
+                newPos.lastMoveString = cellString(i, j) + "-" + cellString(finishI, finishJ);
                 newPos.changeMover();
                 moves.push_back(newPos);
                 if (!isQueen(board[i][j])) {

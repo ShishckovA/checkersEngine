@@ -7,31 +7,33 @@
 
 
 #include "EngineBase.h"
-#include <math.h>
+#include <cmath>
+#include <cstdio>
 
 
 class MinimaxEngine : public EngineBase {
 private:
     constexpr const static double inf = 1000;
     std::unordered_map<std::string, std::pair<int, double>> database;
-    const double discount = 1;
+    [[maybe_unused]] const double discount = 1;
 public:
     int maxDepth;
 
-    MinimaxEngine(int maxDepth): maxDepth(maxDepth) {};
+    explicit MinimaxEngine(int maxDepth): maxDepth(maxDepth) {};
+    virtual ~MinimaxEngine() = default;
 
-    virtual double positionScore(const Position& pos) const = 0;
+    [[nodiscard]] virtual double positionScore(const Position& pos) const = 0;
 
-    double minimax(Position pos, double alpha, double beta, int depth = 0);
+    double minimax(const Position& pos, double alpha, double beta, int depth = 0);
 
     std::string move(Position pos) override;
 
-    std::vector<std::pair<Position, double>> sortedMovesWithScores(const Position &pos) const;
+    [[nodiscard]] std::vector<std::pair<Position, double>> sortedMovesWithScores(const Position &pos) const;
 
 private:
     std::vector<Position> _bestSequence(const Position &start, int depth);
 public:
-    void infinite(const Position &pos, int maxOutput = 3);
+    [[noreturn]] void infinite(const Position &pos, int maxOutput = 3);
     std::vector<Position> bestSequence(const Position &start, int depth=7);
 };
 

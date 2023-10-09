@@ -20,7 +20,7 @@ class Position {
 public:
     std::vector<std::vector<Cell>> board;
     Mover mover;
-    std::string lastMove;
+    std::string lastMoveString;
 
 public:
     Position(): board(std::vector<std::vector<Cell>>(W, std::vector<Cell>(W, EMPTY))), mover(WHITE_MOVE) {}
@@ -30,7 +30,7 @@ public:
 
     void print() const;
 
-    std::vector<Position> moves() const;
+    [[nodiscard]] std::vector<Position> moves() const;
 
 
     void generateMoves(std::vector<Position> &moves, bool &hasAbilityToCapture, int i, int j) const;
@@ -44,19 +44,15 @@ public:
             std::string moveBuffer = ""
     ) const;
 
-    bool isBeatingMove(Cell start, Cell over, Cell finish) const {
-        return isOpponentPiece(over, mover) && finish == EMPTY;
-    }
-
     void movePiece(int i1, int j1, int i2, int j2);
 
-    Position copy() const;
+    [[nodiscard]] Position copy() const;
 
     void changeMover();
 
-    bool capturingAvailable(int i, int j) const;
+    [[nodiscard]] bool capturingAvailable(int i, int j) const;
 
-    Winner winner() {
+    [[nodiscard]] Winner winner() const {
         if (!moves().empty()) {
             return NO_WINNER;
         }

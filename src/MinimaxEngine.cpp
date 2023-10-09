@@ -14,7 +14,7 @@ double MinimaxEngine::minimax(const Position& pos, double alpha, double beta, in
     if (curMoves.empty()) {
         return pos.mover == WHITE_MOVE ? -inf : inf;
     }
-    if (curMoves.size() == 1) {
+    if (curMoves.size() == 1 || (depth == 0 && pos.capturingAvailable())) {
         depth += 1;
     }
     if (depth == 0) {

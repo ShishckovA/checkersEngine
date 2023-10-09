@@ -228,7 +228,7 @@ std::vector<Position> Position::moves() const {
     std::vector<Position> res;
     bool hasAbilityToBeat = false;
     for (int i = 0; i < W; ++i) {
-        for (int j = 0; j < W; ++j) {
+        for (int j = (i + 1) % 2; j < W; j += 2) {
             if (!isMoversPiece(board[i][j], mover)) {
                 continue;
             }
@@ -298,6 +298,17 @@ bool Position::capturingAvailable(int i, int j) const {
                 if (goOver) {
                     return true;
                 }
+            }
+        }
+    }
+    return false;
+}
+
+bool Position::capturingAvailable() const {
+    for (int i = 0; i < W; ++i) {
+        for (int j = (i + 1) % 2; j < W; j += 2) {
+            if (isMoversPiece(board[i][j], mover) && capturingAvailable(i, j)) {
+                return true;
             }
         }
     }

@@ -113,3 +113,32 @@ public:
         return zo * 2 - 1;
     }
 };
+
+class ScoredFracEngineNoMemory2 : public MinimaxEngineNoMemory2 {
+public:
+    explicit ScoredFracEngineNoMemory2(int depth): MinimaxEngineNoMemory2(depth) {};
+
+    [[nodiscard]] double positionScore(const Position& pos) const override {
+        std::vector<double> horizontal_scores = {1.02, 1.08, 1.18, 1.32, 1.51, 1.73, 2};
+        double whites = 0;
+        double black = 0;
+        for (int i = 0; i < W; ++i) {
+            for (int j = (i + 1) % 2; j < W; j += 2) {
+                if (pos.board[i][j] == WHITE_PIECE) {
+                    whites += 1 * horizontal_scores[W - i - 1];
+                }
+                if (pos.board[i][j] == WHITE_QUEEN) {
+                    whites += 5;
+                }
+                if (pos.board[i][j] == BLACK_PIECE) {
+                    black += 1 * horizontal_scores[i];
+                }
+                if (pos.board[i][j] == BLACK_QUEEN) {
+                    black += 5;
+                }
+            }
+        }
+        double zo = whites / (whites + black);
+        return zo * 2 - 1;
+    }
+};

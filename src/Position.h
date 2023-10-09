@@ -92,6 +92,8 @@ public:
         p.mover = inp[read] == '1' ? WHITE_MOVE : BLACK_MOVE;
         return p;
     }
+
+    bool capturingAvailable() const;
 };
 
 
